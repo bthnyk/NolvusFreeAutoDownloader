@@ -1,5 +1,5 @@
 # NolvusFreeAutoDownloader
-![example](https://github.com/user-attachments/assets/2375a795-d807-42c6-a221-1fdadb283799)
+![example](https://github.com/user-attachments/assets/191e280d-7489-4b11-b7af-fbb7050817bc)
 
 ## English
 ### Quickstart
