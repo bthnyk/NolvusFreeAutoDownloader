@@ -1,7 +1,7 @@
-﻿using System;
+﻿using PuppeteerSharp;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using PuppeteerSharp;
 
 namespace NolvusFreeAutoDownloader
 {
@@ -71,58 +71,11 @@ namespace NolvusFreeAutoDownloader
 
             NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputDownloadStarted") + $" {downloadTitle}", LanguageManager.T("Task"));
 
-            //========= ID'S REMOVED FROM NEXUS ==========
-            //await targetPage.WaitForSelectorAsync("button#slowDownloadButton", new WaitForSelectorOptions { Visible = true });
-            //await targetPage.ClickAsync("button#slowDownloadButton");
-            //===========================================
+            await targetPage.WaitForSelectorAsync("button#slowDownloadButton", new WaitForSelectorOptions { Visible = true });
+            await targetPage.ClickAsync("button#slowDownloadButton");
 
-            try
-            {
-                NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputShadowDOMSearch"), LanguageManager.T("Task"));
-
-                string waitFunction = @"() => {
-                    const host = document.querySelector('mod-file-download');
-                    if (!host || !host.shadowRoot) {
-                        return false;
-                    }
-
-                    const buttons = host.shadowRoot.querySelectorAll('button');
-                    
-                    for (const button of buttons) {
-                        if (button.textContent.trim() === 'Slow download') {
-                            return button;
-                        }
-                    }
-
-                    return false;
-                }";
-
-                await targetPage.WaitForFunctionAsync(waitFunction, new WaitForFunctionOptions { Timeout = 30000 });
-
-                NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputShadowDOMFounded"), LanguageManager.T("Task"));
-
-                string clickScript = @"() => {
-                    const host = document.querySelector('mod-file-download');
-                    const buttons = host.shadowRoot.querySelectorAll('button');
-                    for (const button of buttons) {
-                        if (button.textContent.trim() === 'Slow download') {
-                            button.click();
-                            return;
-                        }
-                    }
-                }";
-
-                await targetPage.EvaluateFunctionAsync(clickScript);
-                
-                NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputDownloadButtonClicked"),
-                    LanguageManager.T("Ok"));
-                return true;
-            }
-            catch (Exception ex)
-            {
-                NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputShadowDOMError") + ex.Message, LanguageManager.T("Error"));
-                return false;
-            }
+            NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputDownloadButtonClicked"), LanguageManager.T("Ok"));
+            return true;
         }
 
         private void StopLoop()

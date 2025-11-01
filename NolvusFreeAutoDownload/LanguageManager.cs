@@ -71,10 +71,7 @@ namespace NolvusFreeAutoDownloader
                     { "OutputAdCheck", "Reklam kontrolü yapılıyor..." },
                     { "OutputAdClosed", "Reklam kapatıldı." },
                     { "OutputDownloadStarted", "İndirme başlatılıyor:" },
-                    { "OutputShadowDOMSearch", "Shadow DOM içinde 'Slow download' text'ine sahip buton aranıyor..."},
-                    { "OutputShadowDOMFounded", "ShadowDOM içinde aranan buton bulundu, tıklanıyor..."},
                     { "OutputDownloadButtonClicked", "İndirme isteği onaylandı." },
-                    { "OutputShadowDOMError", "ShadowDOM içinde buton aranırken hata oluştu (muhtemelen bulunamadı): "},
                 };
             }
             else
@@ -122,10 +119,7 @@ namespace NolvusFreeAutoDownloader
                     { "OutputAdCheck", "Advertising control is in progress..." },
                     { "OutputAdClosed", "The advert is closed." },
                     { "OutputDownloadStarted", "Download initiating: " },
-                    { "OutputShadowDOMSearch", "Searching for a button with the text ‘Slow download’ in the Shadow DOM..."},
-                    { "OutputShadowDOMFounded", "The button found in ShadowDOM is being clicked..."},
                     { "OutputDownloadButtonClicked", "Download request approved." },
-                    { "OutputShadowDOMError", "An error occurred while searching for a button in ShadowDOM (probably not found): "},
                 };
             }
         }
