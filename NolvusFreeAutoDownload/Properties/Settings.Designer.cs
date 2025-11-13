@@ -22,5 +22,17 @@ namespace NolvusFreeAutoDownloader.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastFileDirection {
+            get {
+                return ((string)(this["lastFileDirection"]));
+            }
+            set {
+                this["lastFileDirection"] = value;
+            }
+        }
     }
 }

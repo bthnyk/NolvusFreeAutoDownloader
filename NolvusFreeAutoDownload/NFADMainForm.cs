@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Dark.Net;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Dark.Net;
 
 namespace NolvusFreeAutoDownloader
 {
@@ -24,12 +24,22 @@ namespace NolvusFreeAutoDownloader
                 DarkThemeHelper.ApplyDarkTheme(this);
             else
                 DarkThemeHelper.ApplyLightTheme(this);
+
+            btn_Start.Enabled = false;
+            btn_Pause.Enabled = false;
+            btn_Stop.Enabled = false;
+            _isPaused = false;
+
+            tb_Path.Text = Properties.Settings.Default.lastFileDirection;
+            btn_Start.Enabled = !string.IsNullOrEmpty(tb_Path.Text);
         }
 
         private Process _nolvusProcess;
         private DebugConnector _debugConnector;
         private CancellationTokenSource _loopCts;
         private int _wtnsec;
+        private bool _isPaused;
+        private int _consecutiveFailures;
 
         private void btn_ToggleTheme_Click(object sender, EventArgs e)
         {
@@ -58,15 +68,24 @@ namespace NolvusFreeAutoDownloader
         {
             using (var ofd = new OpenFileDialog())
             {
-                ofd.Filter = @"Executable Files|*.exe";
+                ofd.Filter = @"NolvusDashBoard (NolvusDashBoard.exe)|NolvusDashBoard.exe";
                 ofd.Title = LanguageManager.T("SelectFile");
+                ofd.CheckFileExists = true;
+                ofd.Multiselect = false;
+                ofd.FileName = "NolvusDashBoard.exe";
 
                 if (ofd.ShowDialog() != DialogResult.OK) return;
                 tb_Path.Text = ofd.FileName;
+                Properties.Settings.Default.lastFileDirection = ofd.FileName;
+                Properties.Settings.Default.Save();
                 AppendOutput(LanguageManager.T("SelectedFile") + $" {ofd.FileName}", LanguageManager.T("Info"));
             }
-        }
 
+            btn_Start.Enabled = true;
+            btn_Pause.Enabled = false;
+            btn_Stop.Enabled = false;
+        }
+        
         public void AppendOutput(string message, string level)
         {
             var timestamp = DateTime.Now.ToString("HH:mm:ss");
@@ -75,6 +94,14 @@ namespace NolvusFreeAutoDownloader
 
         private async void btn_Start_Click(object sender, EventArgs e)
         {
+            _isPaused = false;
+            _consecutiveFailures = 0;
+
+            btn_Start.Enabled = false;
+            btn_Pause.Enabled = true;
+            btn_Stop.Enabled = true;
+            btn_Browse.Enabled = false;
+
             _wtnsec = (int)nud_WaitSeconds.Value * 1000;
             var exePath = tb_Path.Text.Trim();
 
@@ -114,10 +141,8 @@ namespace NolvusFreeAutoDownloader
                 await _debugConnector.ConnectAsync();
                 AppendOutput(LanguageManager.T("ConnectorConnected"), LanguageManager.T("Ok"));
 
-                // Döngü için CancellationTokenSource oluştur
                 _loopCts = new CancellationTokenSource();
 
-                // Döngüyü başlat
                 _ = RunLoopAsync(_loopCts.Token);
 
             }
@@ -133,20 +158,82 @@ namespace NolvusFreeAutoDownloader
             {
                 try
                 {
-                    AppendOutput(LanguageManager.T("ProcessStarting"), LanguageManager.T("Task"));
-                    var result = await _debugConnector.ProcessSkyrimNexusAsync();
-                    AppendOutput(
-                        result ? LanguageManager.T("ProcessSuccess") : LanguageManager.T("ProcessFail"),
-                        result ? LanguageManager.T("Ok") : LanguageManager.T("Error")
-                    );
+                    if (_consecutiveFailures <= 1)
+                    {
+                        AppendOutput(LanguageManager.T("ProcessStarting"), LanguageManager.T("Task"));
+                    }
+
+                    var result = await _debugConnector.ProcessSkyrimNexusAsync(_consecutiveFailures);
+
+                    if (result)
+                    {
+                        AppendOutput(
+                            LanguageManager.T("ProcessSuccess"),
+                            LanguageManager.T("Ok")
+                        );
+                        _consecutiveFailures = 0;
+                    }
+                    else
+                    {
+                        _consecutiveFailures++;
+
+                        if (_consecutiveFailures <= 1)
+                        {
+                            AppendOutput(
+                                LanguageManager.T("ProcessFail"),
+                                LanguageManager.T("Error")
+                            );
+                        }
+                        else if (_consecutiveFailures == 2)
+                        {
+                            AppendOutput(LanguageManager.T("OutputDownloadTreeFull"), LanguageManager.T("Warning"));
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     AppendOutput(LanguageManager.T("LoopError") + $" {ex.Message}", LanguageManager.T("Error"));
+                    _consecutiveFailures = 0;
                 }
 
                 await Task.Delay(_wtnsec, token);
             }
+        }
+
+        private void btn_Pause_Click(object sender, EventArgs e)
+        {
+            if (_loopCts == null)
+            {
+                AppendOutput(LanguageManager.T("NoRunningProcess"), LanguageManager.T("Info"));
+                
+                btn_Start.Enabled = false;
+                btn_Pause.Enabled = false;
+                btn_Stop.Enabled = false;
+                btn_Browse.Enabled = true;
+
+                return;
+            }
+            if (!_loopCts.IsCancellationRequested)
+            {
+                _loopCts.Cancel();
+                _isPaused = true;
+                AppendOutput(LanguageManager.T("AppPaused"), LanguageManager.T("Ok"));
+                btn_Pause.Text = LanguageManager.T("BtnResume");
+            }
+            else
+            {
+                _consecutiveFailures = 0;
+                _loopCts = new CancellationTokenSource();
+                _ = RunLoopAsync(_loopCts.Token);
+                _isPaused = false;
+                AppendOutput(LanguageManager.T("AppResume"), LanguageManager.T("Ok"));
+                btn_Pause.Text = LanguageManager.T("BtnPause");
+            }
+
+            btn_Start.Enabled = false;
+            btn_Pause.Enabled = true;
+            btn_Stop.Enabled = true;
+            btn_Browse.Enabled = false;
         }
 
         private async void btn_Stop_Click(object sender, EventArgs e)
@@ -178,6 +265,13 @@ namespace NolvusFreeAutoDownloader
                     _debugConnector = null;
                     AppendOutput(LanguageManager.T("ConnectorClosed"), LanguageManager.T("Ok"));
                 }
+
+                _isPaused = false;
+                _consecutiveFailures = 0;
+                btn_Start.Enabled = true;
+                btn_Pause.Enabled = false;
+                btn_Stop.Enabled = false;
+                btn_Browse.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -210,6 +304,23 @@ namespace NolvusFreeAutoDownloader
             btn_Browse.Text = LanguageManager.T("BtnBrowse");
             btn_Start.Text = LanguageManager.T("BtnStart");
             btn_Stop.Text = LanguageManager.T("BtnStop");
+
+            switch (_isPaused)
+            {
+                case true:
+                    btn_Pause.Text = LanguageManager.T("BtnResume");
+                    break;
+
+                case false:
+                    btn_Pause.Text = LanguageManager.T("BtnPause");
+                    break;
+            }
+        }
+
+        private void rtb_Output_TextChanged(object sender, EventArgs e)
+        {
+            rtb_Output.SelectionStart = rtb_Output.Text.Length;
+            rtb_Output.ScrollToCaret();
         }
     }
 }
