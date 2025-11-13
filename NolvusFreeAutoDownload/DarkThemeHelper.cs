@@ -46,12 +46,12 @@ namespace NolvusFreeAutoDownloader
                     rtb.Font = new Font("Consolas", 10, FontStyle.Regular);
                     rtb.BorderStyle = BorderStyle.None;
                 }
-                else if (ctrl is Button)
+                else if (ctrl is Button button)
                 {
-                    ctrl.BackColor = isDark ? Color.FromArgb(70, 70, 70) : SystemColors.Control;
-                    ctrl.ForeColor = isDark ? Color.White : SystemColors.ControlText;
-                    ((Button)ctrl).FlatStyle = FlatStyle.Flat;
-                    ((Button)ctrl).FlatAppearance.BorderColor = isDark ? Color.Gray : SystemColors.ActiveBorder;
+                    button.BackColor = isDark ? Color.FromArgb(70, 70, 70) : SystemColors.Control;
+                    button.ForeColor = isDark ? Color.White : SystemColors.ControlText;
+                    button.FlatStyle = FlatStyle.Flat;
+                    button.FlatAppearance.BorderColor = isDark ? Color.Gray : SystemColors.ActiveBorder;
                 }
                 else if (ctrl is GroupBox)
                 {

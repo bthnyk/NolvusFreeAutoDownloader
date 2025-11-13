@@ -94,61 +94,68 @@ namespace NolvusFreeAutoDownloader
 
         private async void btn_Start_Click(object sender, EventArgs e)
         {
-            _isPaused = false;
-            _consecutiveFailures = 0;
-
-            btn_Start.Enabled = false;
-            btn_Pause.Enabled = true;
-            btn_Stop.Enabled = true;
-            btn_Browse.Enabled = false;
-
-            _wtnsec = (int)nud_WaitSeconds.Value * 1000;
-            var exePath = tb_Path.Text.Trim();
-
-            if (string.IsNullOrEmpty(exePath))
-            {
-                MessageBox.Show(LanguageManager.T("SelectExe"), LanguageManager.T("Warning"), MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (_nolvusProcess != null && !_nolvusProcess.HasExited)
-            {
-                AppendOutput(LanguageManager.T("AppAlreadyRunning"), LanguageManager.T("Warning"));
-                return;
-            }
-
             try
             {
-                var exeDir = System.IO.Path.GetDirectoryName(exePath);
+                _isPaused = false;
+                _consecutiveFailures = 0;
 
-                if (exeDir != null)
+                btn_Start.Enabled = false;
+                btn_Pause.Enabled = true;
+                btn_Stop.Enabled = true;
+                btn_Browse.Enabled = false;
+
+                _wtnsec = (int)nud_WaitSeconds.Value * 1000;
+                var exePath = tb_Path.Text.Trim();
+
+                if (string.IsNullOrEmpty(exePath))
                 {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = exePath,
-                        Arguments = "--remote-debugging-port=8088",
-                        WorkingDirectory = exeDir,
-                        UseShellExecute = true
-                    };
-
-                    _nolvusProcess = Process.Start(psi);
-                    AppendOutput(LanguageManager.T("AppStarted"), LanguageManager.T("Task"));
+                    MessageBox.Show(LanguageManager.T("SelectExe"), LanguageManager.T("Warning"), MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
                 }
 
-                _debugConnector = new DebugConnector();
-                AppendOutput(LanguageManager.T("ConnectorConnecting"), LanguageManager.T("Task"));
-                await _debugConnector.ConnectAsync();
-                AppendOutput(LanguageManager.T("ConnectorConnected"), LanguageManager.T("Ok"));
+                if (_nolvusProcess != null && !_nolvusProcess.HasExited)
+                {
+                    AppendOutput(LanguageManager.T("AppAlreadyRunning"), LanguageManager.T("Warning"));
+                    return;
+                }
 
-                _loopCts = new CancellationTokenSource();
+                try
+                {
+                    var exeDir = System.IO.Path.GetDirectoryName(exePath);
 
-                _ = RunLoopAsync(_loopCts.Token);
+                    if (exeDir != null)
+                    {
+                        var psi = new ProcessStartInfo
+                        {
+                            FileName = exePath,
+                            Arguments = "--remote-debugging-port=8088",
+                            WorkingDirectory = exeDir,
+                            UseShellExecute = true
+                        };
 
+                        _nolvusProcess = Process.Start(psi);
+                        AppendOutput(LanguageManager.T("AppStarted"), LanguageManager.T("Task"));
+                    }
+
+                    _debugConnector = new DebugConnector();
+                    AppendOutput(LanguageManager.T("ConnectorConnecting"), LanguageManager.T("Task"));
+                    await _debugConnector.ConnectAsync();
+                    AppendOutput(LanguageManager.T("ConnectorConnected"), LanguageManager.T("Ok"));
+
+                    _loopCts = new CancellationTokenSource();
+
+                    _ = RunLoopAsync(_loopCts.Token);
+
+                }
+                catch (Exception ex)
+                {
+                    AppendOutput(LanguageManager.T("Error") + $" {ex.Message}", LanguageManager.T("Error"));
+                }
             }
             catch (Exception ex)
             {
-                AppendOutput(LanguageManager.T("Error") + $" {ex.Message}", LanguageManager.T("Error"));
+                throw; // TODO handle exception
             }
         }
 
