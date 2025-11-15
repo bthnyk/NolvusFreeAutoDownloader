@@ -30,10 +30,10 @@ namespace NolvusFreeAutoDownloader
             _isConnected = true;
         }
 
-        public async Task<bool> ProcessSkyrimNexusAsync()
+        public async Task<bool> ProcessSkyrimNexusAsync(int consecutiveFailures)
         {
             if (!_isConnected)
-                throw new InvalidOperationException("Önce ConnectAsync çağrılmalı.");
+                throw new InvalidOperationException(LanguageManager.T("ConnectAsyncError"));
 
             NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputSearch"), LanguageManager.T("Task"));
 
@@ -53,12 +53,16 @@ namespace NolvusFreeAutoDownloader
 
             if (targetPage == null)
             {
-                NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputTargetNotFound"), LanguageManager.T("Warning"));
-                return false;
+                {
+                    if (consecutiveFailures <= 1)
+                        NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputTargetNotFound"),
+                            LanguageManager.T("Warning"));
+                    return false;
+                }
             }
 
             var downloadTitle = await targetPage.EvaluateExpressionAsync<string>("document.title");
-            if (string.IsNullOrWhiteSpace(downloadTitle)) downloadTitle = "BilinmeyenDosya";
+            if (string.IsNullOrWhiteSpace(downloadTitle)) downloadTitle = LanguageManager.T("UnknownFileTitle");
 
             NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputAdCheck"), LanguageManager.T("Task"));
             var adVisible = await targetPage.EvaluateExpressionAsync<bool>("!!document.querySelector('input.close-btn[type=\"checkbox\"]')");
@@ -70,12 +74,7 @@ namespace NolvusFreeAutoDownloader
             }
 
             NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputDownloadStarted") + $" {downloadTitle}", LanguageManager.T("Task"));
-
-            //========= ID'S REMOVED FROM NEXUS ==========
-            //await targetPage.WaitForSelectorAsync("button#slowDownloadButton", new WaitForSelectorOptions { Visible = true });
-            //await targetPage.ClickAsync("button#slowDownloadButton");
-            //===========================================
-
+            
             try
             {
                 NfadMainForm.Instance?.AppendOutput(LanguageManager.T("OutputShadowDOMSearch"), LanguageManager.T("Task"));

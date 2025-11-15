@@ -39,6 +39,7 @@
             this.p_Bot = new System.Windows.Forms.Panel();
             this.rtb_Output = new System.Windows.Forms.RichTextBox();
             this.tlp_SS = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_Pause = new System.Windows.Forms.Button();
             this.btn_Start = new System.Windows.Forms.Button();
             this.btn_Stop = new System.Windows.Forms.Button();
             this.tlp_Mid = new System.Windows.Forms.TableLayoutPanel();
@@ -105,7 +106,7 @@
             this.btn_ToggleTheme.Location = new System.Drawing.Point(951, 6);
             this.btn_ToggleTheme.Name = "btn_ToggleTheme";
             this.btn_ToggleTheme.Size = new System.Drawing.Size(40, 40);
-            this.btn_ToggleTheme.TabIndex = 4;
+            this.btn_ToggleTheme.TabIndex = 1;
             this.btn_ToggleTheme.Text = ".";
             this.btn_ToggleTheme.UseVisualStyleBackColor = true;
             this.btn_ToggleTheme.Click += new System.EventHandler(this.btn_ToggleTheme_Click);
@@ -149,7 +150,7 @@
             this.btn_LangSwitch.Location = new System.Drawing.Point(905, 6);
             this.btn_LangSwitch.Name = "btn_LangSwitch";
             this.btn_LangSwitch.Size = new System.Drawing.Size(40, 40);
-            this.btn_LangSwitch.TabIndex = 6;
+            this.btn_LangSwitch.TabIndex = 0;
             this.btn_LangSwitch.Text = ",";
             this.btn_LangSwitch.UseVisualStyleBackColor = true;
             this.btn_LangSwitch.Click += new System.EventHandler(this.btn_LangSwitch_Click);
@@ -173,31 +174,46 @@
             this.rtb_Output.ReadOnly = true;
             this.rtb_Output.Size = new System.Drawing.Size(998, 541);
             this.rtb_Output.TabIndex = 0;
+            this.rtb_Output.TabStop = false;
             this.rtb_Output.Text = "";
+            this.rtb_Output.TextChanged += new System.EventHandler(this.rtb_Output_TextChanged);
             // 
             // tlp_SS
             // 
             this.tlp_SS.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tlp_SS.ColumnCount = 2;
-            this.tlp_SS.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlp_SS.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_SS.ColumnCount = 3;
+            this.tlp_SS.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tlp_SS.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tlp_SS.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tlp_SS.Controls.Add(this.btn_Pause, 1, 0);
             this.tlp_SS.Controls.Add(this.btn_Start, 0, 0);
-            this.tlp_SS.Controls.Add(this.btn_Stop, 1, 0);
+            this.tlp_SS.Controls.Add(this.btn_Stop, 2, 0);
             this.tlp_SS.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_SS.Location = new System.Drawing.Point(4, 126);
             this.tlp_SS.Name = "tlp_SS";
             this.tlp_SS.RowCount = 1;
-            this.tlp_SS.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_SS.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlp_SS.Size = new System.Drawing.Size(1000, 49);
             this.tlp_SS.TabIndex = 7;
+            // 
+            // btn_Pause
+            // 
+            this.btn_Pause.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btn_Pause.Location = new System.Drawing.Point(337, 4);
+            this.btn_Pause.Name = "btn_Pause";
+            this.btn_Pause.Size = new System.Drawing.Size(326, 41);
+            this.btn_Pause.TabIndex = 5;
+            this.btn_Pause.Text = "Duraklat";
+            this.btn_Pause.UseVisualStyleBackColor = true;
+            this.btn_Pause.Click += new System.EventHandler(this.btn_Pause_Click);
             // 
             // btn_Start
             // 
             this.btn_Start.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btn_Start.Location = new System.Drawing.Point(4, 4);
             this.btn_Start.Name = "btn_Start";
-            this.btn_Start.Size = new System.Drawing.Size(492, 41);
-            this.btn_Start.TabIndex = 0;
+            this.btn_Start.Size = new System.Drawing.Size(326, 41);
+            this.btn_Start.TabIndex = 4;
             this.btn_Start.Text = "Başlat";
             this.btn_Start.UseVisualStyleBackColor = true;
             this.btn_Start.Click += new System.EventHandler(this.btn_Start_Click);
@@ -205,10 +221,10 @@
             // btn_Stop
             // 
             this.btn_Stop.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btn_Stop.Location = new System.Drawing.Point(503, 4);
+            this.btn_Stop.Location = new System.Drawing.Point(670, 4);
             this.btn_Stop.Name = "btn_Stop";
-            this.btn_Stop.Size = new System.Drawing.Size(493, 41);
-            this.btn_Stop.TabIndex = 1;
+            this.btn_Stop.Size = new System.Drawing.Size(326, 41);
+            this.btn_Stop.TabIndex = 6;
             this.btn_Stop.Text = "Durdur";
             this.btn_Stop.UseVisualStyleBackColor = true;
             this.btn_Stop.Click += new System.EventHandler(this.btn_Stop_Click);
@@ -261,7 +277,7 @@
             this.btn_Browse.Location = new System.Drawing.Point(685, 3);
             this.btn_Browse.Name = "btn_Browse";
             this.btn_Browse.Size = new System.Drawing.Size(143, 40);
-            this.btn_Browse.TabIndex = 5;
+            this.btn_Browse.TabIndex = 2;
             this.btn_Browse.Text = "Göz At";
             this.btn_Browse.UseVisualStyleBackColor = true;
             this.btn_Browse.Click += new System.EventHandler(this.btn_Browse_Click);
@@ -284,11 +300,13 @@
             // tb_Path
             // 
             this.tb_Path.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tb_Path.Enabled = false;
             this.tb_Path.Location = new System.Drawing.Point(3, 8);
             this.tb_Path.Name = "tb_Path";
             this.tb_Path.ReadOnly = true;
             this.tb_Path.Size = new System.Drawing.Size(445, 26);
             this.tb_Path.TabIndex = 0;
+            this.tb_Path.TabStop = false;
             this.tb_Path.WordWrap = false;
             // 
             // p_WaitSeconds
@@ -336,7 +354,7 @@
             0});
             this.nud_WaitSeconds.Name = "nud_WaitSeconds";
             this.nud_WaitSeconds.Size = new System.Drawing.Size(46, 26);
-            this.nud_WaitSeconds.TabIndex = 0;
+            this.nud_WaitSeconds.TabIndex = 3;
             this.nud_WaitSeconds.Value = new decimal(new int[] {
             5,
             0,
@@ -397,6 +415,7 @@
         private System.Windows.Forms.TableLayoutPanel tlp_marger;
         private System.Windows.Forms.TextBox tb_Path;
         private System.Windows.Forms.Button btn_LangSwitch;
+        private System.Windows.Forms.Button btn_Pause;
     }
 }
 
