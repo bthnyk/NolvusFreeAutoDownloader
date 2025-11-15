@@ -245,6 +245,14 @@ namespace NolvusFreeAutoDownloader
             if (_nolvusProcess == null || _nolvusProcess.HasExited)
             {
                 AppendOutput(LanguageManager.T("NoRunningProcess"), LanguageManager.T("Info"));
+                _isPaused = false;
+                _consecutiveFailures = 0;
+                _loopCts.Cancel();
+                btn_Pause.Text = LanguageManager.T("BtnPause");
+                btn_Start.Enabled = true;
+                btn_Pause.Enabled = false;
+                btn_Stop.Enabled = false;
+                btn_Browse.Enabled = true;
                 return;
             }
 
