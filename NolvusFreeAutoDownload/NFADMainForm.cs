@@ -194,6 +194,10 @@ namespace NolvusFreeAutoDownloader
                 {
                     AppendOutput(LanguageManager.T("LoopError") + $" {ex.Message}", LanguageManager.T("Error"));
                     _consecutiveFailures = 0;
+                    btn_Start.Enabled = false;
+                    btn_Pause.Enabled = false;
+                    btn_Stop.Enabled = true;
+                    btn_Browse.Enabled = false;
                 }
 
                 await Task.Delay(_wtnsec, token);
@@ -206,7 +210,7 @@ namespace NolvusFreeAutoDownloader
             {
                 AppendOutput(LanguageManager.T("NoRunningProcess"), LanguageManager.T("Info"));
 
-                btn_Start.Enabled = false;
+                btn_Start.Enabled = true;
                 btn_Pause.Enabled = false;
                 btn_Stop.Enabled = false;
                 btn_Browse.Enabled = true;
@@ -284,7 +288,7 @@ namespace NolvusFreeAutoDownloader
             var newLang = LanguageManager.CurrentLanguage == SupportedLanguage.Turkish
                 ? SupportedLanguage.English
                 : SupportedLanguage.Turkish;
-            
+
             LanguageManager.SetLanguage(newLang);
             ApplyLanguage();
         }
